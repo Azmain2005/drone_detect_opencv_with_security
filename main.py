@@ -2,6 +2,17 @@ import cv2
 import torch
 from PIL import Image
 import threading
+import pygame  # Import pygame for audio
+
+# --- AUDIO SETUP ---
+pygame.mixer.init()
+def play_siren():
+    try:
+        # Using music.load is better for longer files like sirens
+        pygame.mixer.music.load('siren2.mp3') 
+        pygame.mixer.music.play()
+    except Exception as e:
+        print(f"Error playing sound: {e}")
 
 # Load YOLOv5 model
 model = torch.hub.load('ultralytics/yolov5', 'custom', path='best.pt', source='github')
@@ -60,7 +71,9 @@ while True:
 
     # Play sound only once when a drone is detected
     if drone_detected and not alert_played:
+        print("!!! DRONE DETECTED: Playing Siren !!!")
         alert_played = True
+        threading.Thread(target=play_siren, daemon=True).start()
 
     # Reset the alert flag if no drone is detected
     if not drone_detected:
